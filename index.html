@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Дифференциалдық модельдер — 6 таб</title>
+
+  <!-- Chart.js and MathJax (only once each) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      }
+    };
+  </script>
+
+  <style>
+    /* Unified styling (keeps visual design from originals) */
+    body {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100%;
+      color: #333;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .header {
+      text-align: center;
+      color: white;
+      margin-bottom: 20px;
+    }
+    .header h1 { font-size: 2rem; margin: 0 0 6px; text-shadow: 1px 1px 3px rgba(0,0,0,0.3); }
+    .header p { margin: 0 0 14px; opacity: .95; }
+
+    .tabs {
+      display: flex;
+      flex-wrap: wrap;
+      background: white;
+      border-radius: 12px 12px 0 0;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    .tab {
+      flex: 1;
+      padding: 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      border: none;
+      background: #f8f9fa;
+      font-size: 1rem;
+      font-weight: 600;
+    }
+    .tab.active {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+    }
+    .tab:hover:not(.active) { background: #e9ecef; }
+
+    .content {
+      background: white;
+      border-radius: 0 0 12px 12px;
+      padding: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    .formula-section { display: none; }
+    .formula-section.active { display: block; }
+
+    .formula-card {
+      background: #f8f9fa;
+      border-radius: 10px;
+      padding: 18px;
+      margin-bottom: 16px;
+      border-left: 5px solid #667eea;
+    }
+    .formula-title { font-size: 1.2rem; font-weight: 700; color: #667eea; margin-bottom: 8px; }
+    .formula-pair {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .controls { display:flex; gap:12px; align-items:center; margin:12px 0; flex-wrap:wrap; }
+    .control-group { display:flex; align-items:center; gap:8px; }
+    .control-group label { font-weight:600; color:#495057; }
+    .control-group input { padding:8px 10px; border:2px solid #e9ecef; border-radius:6px; width:90px; }
+
+    .btn {
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .chart-container {
+      background: white;
+      border-radius: 10px;
+      padding: 12px;
+      margin-top: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    }
+
+    @media (max-width: 820px) {
+      .tabs { flex-direction: column; }
+      .controls { flex-direction: column; align-items:stretch; }
+      .control-group input { width: 100%; }
+      .formula-pair { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Дифференциалдық модельдер мен таралу процестері</h1>
+      <p>Физика, Биология, География, Химия, Температура және Ластану — барлығы бір бетте</p>
+    </div>
+
+    <div class="tabs" role="tablist" aria-label="Models tabs">
+      <button class="tab active" onclick="showTab('physics')">Физика</button>
+      <button class="tab" onclick="showTab('biology')">Биология</button>
+      <button class="tab" onclick="showTab('geography')">География</button>
+      <button class="tab" onclick="showTab('chemistry')">Химия</button>
+      <button class="tab" onclick="showTab('temperature')">Температура</button>
+      <button class="tab" onclick="showTab('pollution')">Ластану</button>
+    </div>
+
+    <div class="content">
+      <!-- PHYSICS -->
+      <section id="physics" class="formula-section active" aria-labelledby="Физика">
+        <div class="formula-card">
+          <div class="formula-title">Гармоникалық тербеліс</div>
+          <div class="formula-pair">
+            <p>Дифференциалдық теңдеу: $$\frac{d^2x}{dt^2} + \omega^2 x = 0$$</p>
+            <p>Қарапайым формула (аналитикалық шешім): $$x(t) = x_0 \cos(\omega t)$$</p>
+          </div>
+        </div>
+        <div class="controls">
+          <div class="control-group"><label for="k-value">k (қатаңдық):</label><input id="k-value" type="number" value="1000" step="100"></div>
+          <div class="control-group"><label for="m-value">m (масса):</label><input id="m-value" type="number" value="10" step="1"></div>
+          <div class="control-group"><label for="x0-value">x₀:</label><input id="x0-value" type="number" value="0.1" step="0.01"></div>
+          <div class="control-group"><label for="dt-phys">Δt (сандық):</label><input id="dt-phys" type="number" value="0.01" step="0.001"></div>
+          <button class="btn" onclick="updatePhysics()">Графикті жаңарту</button>
+        </div>
+        <div class="chart-container"><canvas id="physicsChart"></canvas></div>
+      </section>
+
+      <!-- BIOLOGY -->
+      <section id="biology" class="formula-section" aria-labelledby="Биология">
+        <div class="formula-card">
+          <div class="formula-title">Популяцияның логистикалық өсуі</div>
+          <div class="formula-pair">
+            <p>Дифференциалдық: $$\frac{dN}{dt} = r N \left(1 - \frac{N}{K}\right)$$</p>
+            <p>Қарапайым формула: $$N(t) = \frac{K N_0 e^{r t}}{K + N_0 (e^{r t} - 1)}$$</p>
+          </div>
+        </div>
+        <div class="controls">
+          <div class="control-group"><label for="r-bio">r:</label><input id="r-bio" type="number" value="0.1" step="0.01"></div>
+          <div class="control-group"><label for="K-bio">K:</label><input id="K-bio" type="number" value="1000" step="50"></div>
+          <div class="control-group"><label for="N0-bio">N₀:</label><input id="N0-bio" type="number" value="100" step="10"></div>
+          <div class="control-group"><label for="dt-bio">Δt (сандық):</label><input id="dt-bio" type="number" value="0.1" step="0.01"></div>
+          <button class="btn" onclick="updateBiology()">Графикті жаңарту</button>
+        </div>
+        <div class="chart-container"><canvas id="biologyChart"></canvas></div>
+      </section>
+
+      <!-- GEOGRAPHY (Economics model from original) -->
+      <section id="geography" class="formula-section" aria-labelledby="География">
+        <div class="formula-card">
+          <div class="formula-title">Үздіксіз пайыздық модель</div>
+          <div class="formula-pair">
+            <p>Дифференциалдық: $$\frac{dP}{dt} = r P$$</p>
+            <p>Қарапайым формула: $$P(t) = P_0 e^{r t}$$</p>
+          </div>
+        </div>
+        <div class="controls">
+          <div class="control-group"><label for="P0-econ">P₀:</label><input id="P0-econ" type="number" value="10000" step="1000"></div>
+          <div class="control-group"><label for="r-econ">r %:</label><input id="r-econ" type="number" value="5" step="0.5"></div>
+          <div class="control-group"><label for="years-econ">Жыл:</label><input id="years-econ" type="number" value="10" step="1"></div>
+          <div class="control-group"><label for="dt-geo">Δt (сандық):</label><input id="dt-geo" type="number" value="0.1" step="0.01"></div>
+          <button class="btn" onclick="updateGeography()">Графикті жаңарту</button>
+        </div>
+        <div class="chart-container"><canvas id="geoChart"></canvas></div>
+      </section>
+
+      <!-- CHEMISTRY -->
+      <section id="chemistry" class="formula-section" aria-labelledby="Химия">
+        <div class="formula-card">
+          <div class="formula-title">Екінші ретті реакция кинетикасы</div>
+          <div class="formula-pair">
+            <p>Дифференциалдық: $$-\frac{d[A]}{dt} = 2k[A]^2$$</p>
+            <p>Қарапайым формула: $$[A](t) = \frac{1}{2 k t + \frac{1}{[A]_0}}$$</p>
+          </div>
+        </div>
+        <div class="controls">
+          <div class="control-group"><label for="k-chem">k:</label><input id="k-chem" type="number" value="0.1" step="0.01"></div>
+          <div class="control-group"><label for="A0-chem">[A]₀:</label><input id="A0-chem" type="number" value="0.1" step="0.01"></div>
+          <div class="control-group"><label for="dt-chem">Δt (сандық):</label><input id="dt-chem" type="number" value="0.1" step="0.01"></div>
+          <button class="btn" onclick="updateChemistry()">Графикті жаңарту</button>
+        </div>
+        <div class="chart-container"><canvas id="chemChart"></canvas></div>
+      </section>
+
+      <!-- TEMPERATURE (from second file) -->
+      <section id="temperature" class="formula-section" aria-labelledby="Температура">
+        <div class="formula-card">
+          <div class="formula-title">Температураның таралу теңдеуі</div>
+          <div class="formula-pair">
+            <p>Дифференциалдық теңдеу: $$\frac{\partial T}{\partial t} = \alpha \frac{\partial^2 T}{\partial x^2}$$</p>
+            <p>Қарапайым формула (қарапайым жағдай үшін аналитикалық шешім): $$T(x,t) = T_b + \frac{A}{\sqrt{4\pi \alpha t}} \exp\left(-\frac{(x - x_0)^2}{4\alpha t}\right)$$</p>
+          </div>
+        </div>
+        <div class="controls">
+          <div class="control-group"><label for="alpha">α:</label><input id="alpha" type="number" value="0.01" step="0.001"></div>
+          <div class="control-group"><label for="dx-temp">Δx:</label><input id="dx-temp" type="number" value="0.1" step="0.01"></div>
+          <div class="control-group"><label for="dt-temp">Δt:</label><input id="dt-temp" type="number" value="0.01" step="0.001"></div>
+          <button class="btn" onclick="updateTemperature()">Графикті жаңарту</button>
+        </div>
+        <div class="chart-container"><canvas id="tempChart"></canvas></div>
+      </section>
+
+      <!-- POLLUTION (from second file) -->
+      <section id="pollution" class="formula-section" aria-labelledby="Ластану">
+        <div class="formula-card">
+          <div class="formula-title">Ластану концентрациясының таралу теңдеуі</div>
+          <div class="formula-pair">
+            <p>Дифференциалдық теңдеу: $$\frac{\partial C}{\partial t} = D \frac{\partial^2 C}{\partial x^2} - v\frac{\partial C}{\partial x} + S(x,t)$$</p>
+            <p>Қарапайым формула (қарапайым жағдай үшін аналитикалық шешім, S=0): $$C(x,t) = \frac{A}{\sqrt{4\pi D t}} \exp\left(-\frac{(x - x_0 - v t)^2}{4 D t}\right)$$</p>
+          </div>
+        </div>
+        <div class="controls">
+          <div class="control-group"><label for="D">D:</label><input id="D" type="number" value="0.01" step="0.001"></div>
+          <div class="control-group"><label for="v">v:</label><input id="v" type="number" value="0.1" step="0.01"></div>
+          <div class="control-group"><label for="dx-poll">Δx:</label><input id="dx-poll" type="number" value="0.1" step="0.01"></div>
+          <div class="control-group"><label for="dt-poll">Δt:</label><input id="dt-poll" type="number" value="0.01" step="0.001"></div>
+          <button class="btn" onclick="updatePollution()">Графикті жаңарту</button>
+        </div>
+        <div class="chart-container"><canvas id="pollutionChart"></canvas></div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    // showTab: switch visible section and update charts if needed
+    function showTab(id) {
+      document.querySelectorAll('.formula-section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelector('.tab[onclick*="' + id + '"]').classList.add('active');
+      document.getElementById(id).classList.add('active');
+
+      // After switching, request chart update for that section (so charts render correctly)
+      switch (id) {
+        case 'physics': updatePhysics(); break;
+        case 'biology': updateBiology(); break;
+        case 'geography': updateGeography(); break;
+        case 'chemistry': updateChemistry(); break;
+        case 'temperature': updateTemperature(); break;
+        case 'pollution': updatePollution(); break;
+      }
+    }
+
+    // Shared charts object
+    const charts = {};
+
+    /* ---------------- PHYSICS ---------------- */
+    function updatePhysics() {
+      const k = parseFloat(document.getElementById('k-value').value);
+      const m = parseFloat(document.getElementById('m-value').value);
+      const x0 = parseFloat(document.getElementById('x0-value').value);
+      const dt = parseFloat(document.getElementById('dt-phys').value);
+
+      const omega = Math.sqrt(k / m);
+      const tMax = 2;
+
+      const timePoints = [];
+      const analyticalX = [];
+      const numericalX = [];
+      let x = x0;
+      let v = 0; // initial velocity = 0
+
+      for (let t = 0; t <= tMax + 1e-9; t += dt) {
+        timePoints.push(t.toFixed(2));
+        analyticalX.push(x0 * Math.cos(omega * t));
+
+        // Numerical (Euler method for second-order ODE)
+        const a = -omega * omega * x;
+        v += a * dt;
+        x += v * dt;
+        numericalX.push(x);
+      }
+
+      if (charts.physics) charts.physics.destroy();
+
+      const ctx = document.getElementById('physicsChart').getContext('2d');
+      charts.physics = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: timePoints,
+          datasets: [
+            { label: 'Аналитикалық (қарапайым формула)', data: analyticalX, borderWidth: 2, borderColor: 'blue' },
+            { label: 'Сандық (дифференциалдық)', data: numericalX, borderWidth: 2, borderColor: 'red', borderDash: [5, 5] }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: { title: { display: true, text: 'Гармоникалық тербеліс' } },
+          scales: {
+            x: { title: { display: true, text: 'Уақыт (с)' } },
+            y: { title: { display: true, text: 'Орны (м)' } }
+          }
+        }
+      });
+    }
+
+    /* ---------------- BIOLOGY ---------------- */
+    function updateBiology() {
+      const r = parseFloat(document.getElementById('r-bio').value);
+      const K = parseFloat(document.getElementById('K-bio').value);
+      const N0 = parseFloat(document.getElementById('N0-bio').value);
+      const dt = parseFloat(document.getElementById('dt-bio').value);
+
+      const tMax = 50;
+      const timePoints = [];
+      const analyticalN = [];
+      const numericalN = [];
+      let N = N0;
+
+      for (let t = 0; t <= tMax + 1e-9; t += dt) {
+        timePoints.push(t.toFixed(1));
+        const expTerm = Math.exp(r * t);
+        analyticalN.push((K * N0 * expTerm) / (K + N0 * (expTerm - 1)));
+
+        // Numerical (Euler method)
+        const dN = r * N * (1 - N / K);
+        N += dN * dt;
+        numericalN.push(N);
+      }
+
+      if (charts.biology) charts.biology.destroy();
+
+      const ctx = document.getElementById('biologyChart').getContext('2d');
+      charts.biology = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: timePoints,
+          datasets: [
+            { label: 'Аналитикалық (қарапайым формула)', data: analyticalN, borderWidth: 2, borderColor: 'blue' },
+            { label: 'Сандық (дифференциалдық)', data: numericalN, borderWidth: 2, borderColor: 'red', borderDash: [5, 5] }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: { title: { display: true, text: 'Популяцияның логистикалық өсімі' } },
+          scales: {
+            x: { title: { display: true, text: 'Уақыт' } },
+            y: { title: { display: true, text: 'Популяция' } }
+          }
+        }
+      });
+    }
+
+    /* ---------------- GEOGRAPHY (Economics) ---------------- */
+    function updateGeography() {
+      const P0 = parseFloat(document.getElementById('P0-econ').value);
+      const rPercent = parseFloat(document.getElementById('r-econ').value);
+      const years = parseFloat(document.getElementById('years-econ').value);
+      const dt = parseFloat(document.getElementById('dt-geo').value);
+
+      const r = rPercent / 100;
+      const timePoints = [];
+      const analyticalP = [];
+      const numericalP = [];
+      let P = P0;
+
+      for (let t = 0; t <= years + 1e-9; t += dt) {
+        timePoints.push(t.toFixed(1));
+        analyticalP.push(P0 * Math.exp(r * t));
+
+        // Numerical (Euler)
+        const dP = r * P;
+        P += dP * dt;
+        numericalP.push(P);
+      }
+
+      if (charts.geo) charts.geo.destroy();
+      const ctx = document.getElementById('geoChart').getContext('2d');
+      charts.geo = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: timePoints,
+          datasets: [
+            { label: 'Аналитикалық (қарапайым формула)', data: analyticalP, borderWidth: 2, borderColor: 'blue' },
+            { label: 'Сандық (дифференциалдық)', data: numericalP, borderWidth: 2, borderColor: 'red', borderDash: [5, 5] }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: { title: { display: true, text: 'Қаржы өсімі (үздіксіз)' } },
+          scales: { x: { title: { display: true, text: 'Уақыт (жыл)' } }, y: { title: { display: true, text: 'Сома' } } }
+        }
+      });
+    }
+
+    /* ---------------- CHEMISTRY ---------------- */
+    function updateChemistry() {
+      const k = parseFloat(document.getElementById('k-chem').value);
+      const A0 = parseFloat(document.getElementById('A0-chem').value);
+      const dt = parseFloat(document.getElementById('dt-chem').value);
+
+      const tMax = 50;
+      const timePoints = [];
+      const analyticalA = [];
+      const numericalA = [];
+      let A = A0;
+
+      for (let t = 0; t <= tMax + 1e-9; t += dt) {
+        timePoints.push(t.toFixed(1));
+        analyticalA.push(1 / (2 * k * t + 1 / A0));
+
+        // Numerical (Euler, note: dA/dt = -2k A^2)
+        const dA = -2 * k * A * A;
+        A += dA * dt;
+        numericalA.push(A);
+      }
+
+      if (charts.chem) charts.chem.destroy();
+      const ctx = document.getElementById('chemChart').getContext('2d');
+      charts.chem = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: timePoints,
+          datasets: [
+            { label: 'Аналитикалық (қарапайым формула)', data: analyticalA, borderWidth: 2, borderColor: 'blue' },
+            { label: 'Сандық (дифференциалдық)', data: numericalA, borderWidth: 2, borderColor: 'red', borderDash: [5, 5] }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: { title: { display: true, text: 'Екінші ретті реакция кинетикасы' } },
+          scales: { x: { title: { display: true, text: 'Уақыт (с)' } }, y: { title: { display: true, text: 'Концентрация' } } }
+        }
+      });
+    }
+
+    /* ---------------- TEMPERATURE ---------------- */
+    function updateTemperature() {
+      const alpha = parseFloat(document.getElementById('alpha').value);
+      const dx = parseFloat(document.getElementById('dx-temp').value);
+      const dt = parseFloat(document.getElementById('dt-temp').value);
+
+      const nx = 30;
+      const Tb = 20; // background
+      const impulse = 100 - Tb;
+      const A = impulse * dx; // for conservation
+      const x0 = Math.floor(nx / 2) * dx;
+      let T = new Array(nx).fill(Tb);
+      T[Math.floor(nx / 2)] = 100;
+      const timeSteps = 80;
+      const t = timeSteps * dt;
+
+      for (let n = 0; n < timeSteps; n++) {
+        const Tn = T.slice();
+        for (let i = 1; i < nx - 1; i++) {
+          T[i] = Tn[i] + alpha * dt / (dx * dx) * (Tn[i + 1] - 2 * Tn[i] + Tn[i - 1]);
+        }
+      }
+
+      // Analytical for point source
+      const xPoints = [];
+      const analyticalT = [];
+      for (let i = 0; i < nx; i++) {
+        const x = i * dx;
+        xPoints.push(x.toFixed(2));
+        if (t > 0) {
+          analyticalT.push(Tb + A / Math.sqrt(4 * Math.PI * alpha * t) * Math.exp( -Math.pow(x - x0, 2) / (4 * alpha * t) ));
+        } else {
+          analyticalT.push(Tb);
+        }
+      }
+
+      if (charts.temp) charts.temp.destroy();
+      const ctx = document.getElementById('tempChart').getContext('2d');
+      charts.temp = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: xPoints,
+          datasets: [
+            { label: 'Аналитикалық (қарапайым формула)', data: analyticalT, borderWidth: 2, borderColor: 'blue' },
+            { label: 'Сандық (дифференциалдық)', data: T, borderWidth: 2, borderColor: 'red', borderDash: [5, 5] }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: { title: { display: true, text: 'Температура таралуы' } },
+          scales: {
+            x: { title: { display: true, text: 'x (м)' } },
+            y: { title: { display: true, text: 'T (C)' } }
+          }
+        }
+      });
+    }
+
+    /* ---------------- POLLUTION ---------------- */
+    function updatePollution() {
+      const D = parseFloat(document.getElementById('D').value);
+      const v = parseFloat(document.getElementById('v').value);
+      const dx = parseFloat(document.getElementById('dx-poll').value);
+      const dt = parseFloat(document.getElementById('dt-poll').value);
+
+      const nx = 30;
+      const impulse = 10;
+      const A = impulse * dx;
+      const x0 = Math.floor(nx / 3) * dx;
+      let C = new Array(nx).fill(0);
+      C[Math.floor(nx / 3)] = impulse;
+      const timeSteps = 100;
+      const t = timeSteps * dt;
+
+      for (let n = 0; n < timeSteps; n++) {
+        const Cn = C.slice();
+        for (let i = 1; i < nx - 1; i++) {
+          const lap = (Cn[i + 1] - 2 * Cn[i] + Cn[i - 1]) / (dx * dx);
+          const adv = (Cn[i] - Cn[i - 1]) / dx;
+          C[i] = Cn[i] + dt * (D * lap - v * adv);
+        }
+      }
+
+      // Analytical for point source without S
+      const xPoints = [];
+      const analyticalC = [];
+      for (let i = 0; i < nx; i++) {
+        const x = i * dx;
+        xPoints.push(x.toFixed(2));
+        if (t > 0) {
+          analyticalC.push(A / Math.sqrt(4 * Math.PI * D * t) * Math.exp( -Math.pow(x - x0 - v * t, 2) / (4 * D * t) ));
+        } else {
+          analyticalC.push(0);
+        }
+      }
+
+      if (charts.pollution) charts.pollution.destroy();
+      const ctx = document.getElementById('pollutionChart').getContext('2d');
+      charts.pollution = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: xPoints,
+          datasets: [
+            { label: 'Аналитикалық (қарапайым формула)', data: analyticalC, borderWidth: 2, borderColor: 'blue' },
+            { label: 'Сандық (дифференциалдық)', data: C, borderWidth: 2, borderColor: 'red', borderDash: [5, 5] }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: { title: { display: true, text: 'Ластану концентрациясы' } },
+          scales: {
+            x: { title: { display: true, text: 'x (м)' } },
+            y: { title: { display: true, text: 'C' } }
+          }
+        }
+      });
+    }
+
+    // Initialize first visible tab charts on load
+    window.addEventListener('load', () => {
+      updatePhysics();
+      updateBiology();
+      updateGeography();
+      updateChemistry();
+      updateTemperature();
+      updatePollution();
+    });
+  </script>
+</body>
+</html>
